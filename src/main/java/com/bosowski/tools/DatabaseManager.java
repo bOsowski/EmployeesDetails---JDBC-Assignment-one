@@ -9,16 +9,14 @@ public class DatabaseManager {
 
     private Connection conn;
 
-
     private DatabaseManager() {
         try {
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/Assignment1?user=root&password=");
             System.out.println("Successfully Connected!");
         } catch (SQLException e) {
             e.printStackTrace();
-            System.exit(1);
+            System.exit(-1);
         }
-
     }
 
     /**
@@ -41,7 +39,18 @@ public class DatabaseManager {
                 result.get(columnName).add(rs.getString(columnName));
             }
         }
-
         return result;
+    }
+
+
+    /**
+     *
+     * @param sqlUpdate -> the query to execute.
+     * @return either (1) the row count for SQL Data Manipulation Language (DML) statements
+     *         or (2) 0 for SQL statements that return nothing.
+     * @throws SQLException
+     */
+    public int executeUpdate(String sqlUpdate) throws SQLException {
+        return conn.createStatement().executeUpdate(sqlUpdate);
     }
 }
