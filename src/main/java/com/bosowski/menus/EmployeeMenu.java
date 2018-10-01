@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class EmployeeMenu implements Menu{
+public class EmployeeMenu extends Menu{
 
     private JTextField ssnField = new JTextField(20);//createRestrictedTextField(20);
     private JTextField dobField = new JTextField(20);
@@ -20,49 +20,34 @@ public class EmployeeMenu implements Menu{
 
     private int currentEmployeeSsn = 0;
 
-    public EmployeeMenu(){
-//        HashMap<String, ArrayList<Object>> result;
-//        try {
-//            result = DatabaseManager.instance.executeQuery("select * from Employee where Ssn > "+currentEmployeeSsn+" order by Ssn asc limit 1;");
-//            System.out.println(result);
-//            dobField.setText((String)result.get("Bdate").get(0));
-//            nameField.setText((String)result.get("Name").get(0));
-//            addressField.setText((String)result.get("Address").get(0));
-//            salaryField.setText((String)result.get("Salary").get(0));
-//            genderField.setText((String)result.get("Gender").get(0));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+    public EmployeeMenu(JTabbedPane tabWindow) {
+        createUI(tabWindow);
+        HashMap<String, ArrayList<Object>> result;
+        try {
+            result = DatabaseManager.instance.executeQuery("select * from Employee where Ssn > "+currentEmployeeSsn+" order by Ssn asc limit 1;");
+            System.out.println(result);
+            ssnField.setText((String)result.get("Ssn").get(0));
+            dobField.setText((String)result.get("Bdate").get(0));
+            nameField.setText((String)result.get("Name").get(0));
+            addressField.setText((String)result.get("Address").get(0));
+            salaryField.setText((String)result.get("Salary").get(0));
+            genderField.setText((String)result.get("Gender").get(0));
+            currentEmployeeSsn = Integer.parseInt(ssnField.getText());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+
     public void createUI(JTabbedPane tabWindow) {
-//        JPanel verticalPanel = setUpJPanel();
-        JPanel verticalPanel = new JPanel();
+        JPanel verticalPanel = setUpJPanel();
         tabWindow.addTab("Employee", verticalPanel);
-
-        verticalPanel.setLayout(new BoxLayout(verticalPanel, BoxLayout.Y_AXIS));
-        verticalPanel.setSize(new Dimension(Constants.WIDTH, Constants.HEIGHT));
-
-
-        //Add buttons to panels
-        bottomButtonPanel.add(addButton);
-        bottomButtonPanel.add(deleteButton);
-        bottomButtonPanel.add(updateButton);
-
-        verticalButtonPanel.setLayout(new BoxLayout(verticalButtonPanel, BoxLayout.Y_AXIS));
-        verticalButtonPanel.add(previousButton);
-        verticalButtonPanel.add(nextButton);
-        verticalButtonPanel.add(clearButton);
-
 
         horizontalPanel.add(contentPanel);
         horizontalPanel.add(verticalButtonPanel);
 
         verticalPanel.add(horizontalPanel);
         verticalPanel.add(bottomButtonPanel);
-
-
-
 
         JLabel ssnLabel = new JLabel("Ssn");
         JLabel nameLabel = new JLabel("Name");
@@ -112,7 +97,6 @@ public class EmployeeMenu implements Menu{
         horizontalPanel.add(contentPanel);
     }
 
-    @Override
     public void setUpButtonActionHandlers() {
         addButton.addActionListener(e -> {
             try{

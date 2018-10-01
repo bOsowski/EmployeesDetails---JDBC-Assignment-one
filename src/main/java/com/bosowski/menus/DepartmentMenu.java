@@ -4,8 +4,10 @@ import com.bosowski.tools.Constants;
 import com.bosowski.tools.DatabaseManager;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-public class DepartmentMenu implements Menu{
+public class DepartmentMenu extends Menu{
 
     private JTextField numberField = new JTextField(20);//createRestrictedTextField(20);
     private JTextField nameField = new JTextField(20);
@@ -13,8 +15,23 @@ public class DepartmentMenu implements Menu{
 
     private int currentNumber = 0;
 
+    public DepartmentMenu(JTabbedPane tabWindow) {
+        createUI(tabWindow);
+        HashMap<String, ArrayList<Object>> result;
+        try {
+            result = DatabaseManager.instance.executeQuery("select * from Department where number > "+currentNumber+" order by number asc limit 1;");
+            System.out.println(result);
+            numberField.setText((String)result.get("Number").get(0));
+            nameField.setText((String)result.get("Name").get(0));
+            locationsField.setText((String)result.get("Locations").get(0));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void createUI(JTabbedPane tabWindow) {
-        JPanel jpanel = setUpJPanel();
+        JPanel tabPanel = setUpJPanel();
+        tabWindow.addTab("Department", tabPanel);
 
         JLabel nameLabel = new JLabel("Name");
         JLabel numberLabel = new JLabel("Number");
@@ -41,11 +58,8 @@ public class DepartmentMenu implements Menu{
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
         horizontalPanel.add(contentPanel);
-
-        tabWindow.addTab("Department", jpanel);
     }
 
-    @Override
     public void setUpButtonActionHandlers() {
         addButton.addActionListener(e -> {
             try{
