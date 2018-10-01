@@ -3,6 +3,7 @@ package com.bosowski.tools;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class DatabaseManager {
     public static final DatabaseManager instance = new DatabaseManager();
@@ -25,18 +26,18 @@ public class DatabaseManager {
      * @return A map with column names as keys containing an arraylist of values for each key.
      * @throws SQLException
      */
-    public HashMap<String, ArrayList<Object>> executeQuery(String sqlQuery) throws SQLException {
-        HashMap<String, ArrayList<Object>> result = new HashMap<>();
+    public LinkedHashMap<String, ArrayList<Object>> executeQuery(String sqlQuery) throws SQLException {
+        LinkedHashMap<String, ArrayList<Object>> result = new LinkedHashMap<>();
         ResultSet rs = conn.prepareStatement(sqlQuery).executeQuery();
         ResultSetMetaData rsmd = rs.getMetaData();
 
         for(int i = 1; i < rsmd.getColumnCount(); i++){
-            result.put(rsmd.getColumnLabel(i), new ArrayList<>());
+            result.put(rsmd.getColumnLabel(i).toLowerCase(), new ArrayList<>());
         }
 
         while(rs.next()){
             for(String columnName: result.keySet()){
-                result.get(columnName).add(rs.getString(columnName));
+                result.get(columnName.toLowerCase()).add(rs.getString(columnName));
             }
         }
         return result;
