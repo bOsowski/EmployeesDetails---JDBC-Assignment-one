@@ -9,33 +9,31 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class EmployeeMenu extends Menu{
+public class Employee extends Menu{
 
-    private JTextField ssnField = new JTextField(20);//createRestrictedTextField(20);
-    private JTextField dobField = new JTextField(20);
-    private JTextField nameField = new JTextField(20);
-    private JTextField addressField = new JTextField(20);
-    private JTextField salaryField = new JTextField(20);//createRestrictedTextField(20);
-    private JTextField genderField = new JTextField(20);
+    public JTextField ssnField = new JTextField(20);//createRestrictedTextField(20);
+    public JTextField dobField = new JTextField(20);
+    public JTextField nameField = new JTextField(20);
+    public JTextField addressField = new JTextField(20);
+    public JTextField salaryField = new JTextField(20);//createRestrictedTextField(20);
+    public JTextField genderField = new JTextField(20);
 
-    private int currentEmployeeSsn = 0;
-
-    public EmployeeMenu(JTabbedPane tabWindow) {
+    public Employee(JTabbedPane tabWindow) {
         createUI(tabWindow);
-        HashMap<String, ArrayList<Object>> result;
-        try {
-            result = DatabaseManager.instance.executeQuery("select * from Employee where Ssn > "+currentEmployeeSsn+" order by Ssn asc limit 1;");
-            System.out.println(result);
-            ssnField.setText((String)result.get("Ssn").get(0));
-            dobField.setText((String)result.get("Bdate").get(0));
-            nameField.setText((String)result.get("Name").get(0));
-            addressField.setText((String)result.get("Address").get(0));
-            salaryField.setText((String)result.get("Salary").get(0));
-            genderField.setText((String)result.get("Gender").get(0));
-            currentEmployeeSsn = Integer.parseInt(ssnField.getText());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        HashMap<String, ArrayList<Object>> result;
+//        try {
+//            result = DatabaseManager.instance.executeQuery("select * from Employee where Ssn > "+currentEmployeeSsn+" order by Ssn asc limit 1;");
+//            System.out.println(result);
+//            ssnField.setText((String)result.get("Ssn").get(0));
+//            dobField.setText((String)result.get("Bdate").get(0));
+//            nameField.setText((String)result.get("Name").get(0));
+//            addressField.setText((String)result.get("Address").get(0));
+//            salaryField.setText((String)result.get("Salary").get(0));
+//            genderField.setText((String)result.get("Gender").get(0));
+//            currentEmployeeSsn = Integer.parseInt(ssnField.getText());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
 
@@ -55,6 +53,8 @@ public class EmployeeMenu extends Menu{
         JLabel dobLabel = new JLabel("DoB");
         JLabel salaryLabel = new JLabel("Salary");
         JLabel genderLabel = new JLabel("Gender");
+
+        //ssnField.setText();
 
         JPanel ssnPanel = new JPanel();
         ssnPanel.setSize(panelDimension);

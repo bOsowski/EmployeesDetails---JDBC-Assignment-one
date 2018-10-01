@@ -7,26 +7,24 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class DepartmentMenu extends Menu{
+public class Department extends Menu{
 
-    private JTextField numberField = new JTextField(20);//createRestrictedTextField(20);
-    private JTextField nameField = new JTextField(20);
-    private JTextField locationsField = new JTextField(20);
+    public JTextField numberField = new JTextField(20);//createRestrictedTextField(20);
+    public JTextField nameField = new JTextField(20);
+    public JTextField locationsField = new JTextField(20);
 
-    private int currentNumber = 0;
-
-    public DepartmentMenu(JTabbedPane tabWindow) {
+    public Department(JTabbedPane tabWindow) {
         createUI(tabWindow);
-        HashMap<String, ArrayList<Object>> result;
-        try {
-            result = DatabaseManager.instance.executeQuery("select * from Department where number > "+currentNumber+" order by number asc limit 1;");
-            System.out.println(result);
-            numberField.setText((String)result.get("Number").get(0));
-            nameField.setText((String)result.get("Name").get(0));
-            locationsField.setText((String)result.get("Locations").get(0));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        HashMap<String, ArrayList<Object>> result;
+//        try {
+//            result = DatabaseManager.instance.executeQuery("select * from Department where number > "+currentNumber+" order by number asc limit 1;");
+//            System.out.println(result);
+//            numberField.setText((String)result.get("Number").get(0));
+//            nameField.setText((String)result.get("Name").get(0));
+//            locationsField.setText((String)result.get("Locations").get(0));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     public void createUI(JTabbedPane tabWindow) {
