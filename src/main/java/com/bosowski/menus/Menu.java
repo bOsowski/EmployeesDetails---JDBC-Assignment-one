@@ -5,7 +5,7 @@ import com.bosowski.tools.Constants;
 import javax.swing.*;
 import java.awt.*;
 
-public interface Menu {
+abstract class Menu {
 
     JButton previousButton = new JButton("Previous");
     JButton nextButton = new JButton("Next");
@@ -21,15 +21,14 @@ public interface Menu {
     JPanel contentPanel = new JPanel();
     Dimension panelDimension = new Dimension(140, 10);
 
-    void createUI(JTabbedPane tabWindow);
+    abstract void createUI(JTabbedPane tabWindow);
 
-    void setUpButtonActionHandlers();
+    abstract void setUpButtonActionHandlers();
 
-    default JPanel setUpJPanel(){
+    JPanel setUpJPanel(){
         JPanel verticalPanel = new JPanel();
         verticalPanel.setLayout(new BoxLayout(verticalPanel, BoxLayout.Y_AXIS));
         verticalPanel.setSize(new Dimension(Constants.WIDTH, Constants.HEIGHT));
-
 
         //Add buttons to panels
         bottomButtonPanel.add(addButton);
