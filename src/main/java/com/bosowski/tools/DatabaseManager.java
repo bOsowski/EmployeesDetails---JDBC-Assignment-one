@@ -50,7 +50,14 @@ public class DatabaseManager {
      *         or (2) 0 for SQL statements that return nothing.
      * @throws SQLException
      */
-    public int executeUpdate(String sqlUpdate) throws SQLException {
-        return conn.createStatement().executeUpdate(sqlUpdate);
+    public int executeUpdate(String sqlUpdate) {
+        System.out.println(sqlUpdate);
+        try {
+            conn.createStatement().executeUpdate(sqlUpdate);
+            return 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 }
