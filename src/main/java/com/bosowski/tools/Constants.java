@@ -2,6 +2,6 @@ package com.bosowski.tools;
 
 public class Constants {
 
-    public static final int WIDTH = 500;
-    public static final int HEIGHT = 350;
+    public static final int WIDTH = 550;
+    public static final int HEIGHT = 400;
 }

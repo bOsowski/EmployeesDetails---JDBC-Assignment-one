@@ -27,6 +27,8 @@ public class DatabaseManager {
      * @throws SQLException
      */
     public LinkedHashMap<String, ArrayList<Object>> executeQuery(String sqlQuery) throws SQLException {
+        System.out.println(sqlQuery);
+
         LinkedHashMap<String, ArrayList<Object>> result = new LinkedHashMap<>();
         ResultSet rs = conn.prepareStatement(sqlQuery).executeQuery();
         ResultSetMetaData rsmd = rs.getMetaData();

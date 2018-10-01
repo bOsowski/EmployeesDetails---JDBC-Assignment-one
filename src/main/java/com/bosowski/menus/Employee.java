@@ -1,39 +1,28 @@
 package com.bosowski.menus;
 
-import com.bosowski.tools.Constants;
+import com.bosowski.main.Main;
 import com.bosowski.tools.DatabaseManager;
 
 import javax.swing.*;
-import java.awt.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class Employee extends Menu{
 
     public JTextField ssnField = new JTextField(20);//createRestrictedTextField(20);
-    public JTextField dobField = new JTextField(20);
+    public JTextField bdateField = new JTextField(20);
     public JTextField nameField = new JTextField(20);
     public JTextField addressField = new JTextField(20);
     public JTextField salaryField = new JTextField(20);//createRestrictedTextField(20);
-    public JTextField genderField = new JTextField(20);
+    public JTextField sexField = new JTextField(20);
+    public JComboBox<String> works_forField = new JComboBox<>();
 
-    public Employee(JTabbedPane tabWindow) {
+    public Employee(JTabbedPane tabWindow, Main parent) {
+        super(parent);
         createUI(tabWindow);
-//        HashMap<String, ArrayList<Object>> result;
-//        try {
-//            result = DatabaseManager.instance.executeQuery("select * from Employee where Ssn > "+currentEmployeeSsn+" order by Ssn asc limit 1;");
-//            System.out.println(result);
-//            ssnField.setText((String)result.get("Ssn").get(0));
-//            dobField.setText((String)result.get("Bdate").get(0));
-//            nameField.setText((String)result.get("Name").get(0));
-//            addressField.setText((String)result.get("Address").get(0));
-//            salaryField.setText((String)result.get("Salary").get(0));
-//            genderField.setText((String)result.get("Gender").get(0));
-//            currentEmployeeSsn = Integer.parseInt(ssnField.getText());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        refreshDepartmentsField();
+        indexColumnName = "ssn";
     }
 
 
@@ -53,6 +42,7 @@ public class Employee extends Menu{
         JLabel dobLabel = new JLabel("DoB");
         JLabel salaryLabel = new JLabel("Salary");
         JLabel genderLabel = new JLabel("Gender");
+        JLabel departmentsLabel = new JLabel("Works for");
 
         //ssnField.setText();
 
@@ -64,7 +54,7 @@ public class Employee extends Menu{
         JPanel dobPanel = new JPanel();
         dobPanel.setSize(panelDimension);
         dobPanel.add(dobLabel);
-        dobPanel.add(dobField);
+        dobPanel.add(bdateField);
 
         JPanel namePanel = new JPanel();
         namePanel.setSize(panelDimension);
@@ -84,7 +74,12 @@ public class Employee extends Menu{
         JPanel genderPanel = new JPanel();
         genderPanel.setSize(panelDimension);
         genderPanel.add(genderLabel);
-        genderPanel.add(genderField);
+        genderPanel.add(sexField);
+
+        JPanel departmentsPanel = new JPanel();
+        departmentsPanel.setSize(panelDimension);
+        departmentsPanel.add(departmentsLabel);
+        departmentsPanel.add(works_forField);
 
         contentPanel.add(ssnPanel);
         contentPanel.add(dobPanel);
@@ -92,26 +87,22 @@ public class Employee extends Menu{
         contentPanel.add(addressPanel);
         contentPanel.add(salaryPanel);
         contentPanel.add(genderPanel);
+        contentPanel.add(departmentsPanel);
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
         horizontalPanel.add(contentPanel);
     }
 
-    public void setUpButtonActionHandlers() {
-        addButton.addActionListener(e -> {
-            try{
-                DatabaseManager.instance.executeUpdate(
-                        "insert into employee(Ssn, Name, Address, Bdate, Salary, Sex) " +
-                                "values ("+ssnField.getText() +
-                                ", '"+nameField.getText()+"', " +
-                                "'"+addressField.getText()+"', "+
-                                "'"+dobField.getText()+"', "+
-                                salaryField.getText()+
-                                ", '"+genderField.getText()+"');");
-            }catch (Exception exception){
-                System.out.println(exception.toString());
+    public void refreshDepartmentsField(){
+        works_forField.removeAllItems();
+        try {
+            LinkedHashMap<String, ArrayList<Object>> results = DatabaseManager.instance.executeQuery("select * from department");
+            for(int i = 0; i<results.get("number").size(); i++){
+                works_forField.addItem(results.get("number").get(i) + " - " + results.get("name").get(i));
             }
-        });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 

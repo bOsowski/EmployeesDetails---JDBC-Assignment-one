@@ -1,11 +1,9 @@
 package com.bosowski.menus;
 
-import com.bosowski.tools.Constants;
+import com.bosowski.main.Main;
 import com.bosowski.tools.DatabaseManager;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Department extends Menu{
 
@@ -13,18 +11,10 @@ public class Department extends Menu{
     public JTextField nameField = new JTextField(20);
     public JTextField locationsField = new JTextField(20);
 
-    public Department(JTabbedPane tabWindow) {
+    public Department(JTabbedPane tabWindow, Main parent) {
+        super(parent);
         createUI(tabWindow);
-//        HashMap<String, ArrayList<Object>> result;
-//        try {
-//            result = DatabaseManager.instance.executeQuery("select * from Department where number > "+currentNumber+" order by number asc limit 1;");
-//            System.out.println(result);
-//            numberField.setText((String)result.get("Number").get(0));
-//            nameField.setText((String)result.get("Name").get(0));
-//            locationsField.setText((String)result.get("Locations").get(0));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        indexColumnName = "number";
     }
 
     public void createUI(JTabbedPane tabWindow) {
@@ -56,19 +46,5 @@ public class Department extends Menu{
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
         horizontalPanel.add(contentPanel);
-    }
-
-    public void setUpButtonActionHandlers() {
-        addButton.addActionListener(e -> {
-            try{
-                DatabaseManager.instance.executeUpdate(
-                        "insert into department(Name, Number, Locations) " +
-                                "values ("+nameField.getText() +
-                                ", "+numberField.getText()+", " +
-                                ", '"+locationsField.getText()+"');");
-            }catch (Exception exception){
-                System.out.println(exception.toString());
-            }
-        });
     }
 }

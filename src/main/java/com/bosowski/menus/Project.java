@@ -1,10 +1,8 @@
 package com.bosowski.menus;
 
-import com.bosowski.tools.DatabaseManager;
+import com.bosowski.main.Main;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Project extends Menu{
 
@@ -13,21 +11,10 @@ public class Project extends Menu{
     public JTextField locationField = new JTextField(20);
     public JTextField controlledByField = new JTextField(20);
 
-    public Project(JTabbedPane tabWindow) {
+    public Project(JTabbedPane tabWindow, Main parent) {
+        super(parent);
         createUI(tabWindow);
-//        HashMap<String, ArrayList<Object>> result;
-//        try {
-//            result = DatabaseManager.instance.executeQuery("select * from Employee where Ssn > "+currentNumber+" order by Ssn asc limit 1;");
-//            System.out.println(result);
-//            numberField.setText((String)result.get("Number").get(0));
-//            nameField.setText((String)result.get("Name").get(0));
-//            locationField.setText((String)result.get("Location").get(0));
-//            controlledByField.setText((String)result.get("ControlledBy").get(0));
-//            currentNumber = Integer.parseInt(numberField.getText());
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        indexColumnName = "number";
     }
 
     public void createUI(JTabbedPane tabWindow) {
@@ -67,9 +54,5 @@ public class Project extends Menu{
         horizontalPanel.add(contentPanel);
 
         tabWindow.addTab("Project", jpanel);
-    }
-
-    public void setUpButtonActionHandlers() {
-
     }
 }

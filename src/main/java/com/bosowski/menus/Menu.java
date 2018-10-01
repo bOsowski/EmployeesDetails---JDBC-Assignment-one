@@ -1,20 +1,21 @@
 package com.bosowski.menus;
 
+import com.bosowski.main.Main;
 import com.bosowski.tools.Constants;
 import com.bosowski.tools.DatabaseManager;
 
 import java.lang.reflect.*;
 
 import javax.swing.*;
+import javax.xml.crypto.Data;
 import java.awt.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.*;
 
 abstract class Menu {
+
+    Main parent;
 
     JButton previousButton = new JButton("Previous");
     JButton nextButton = new JButton("Next");
@@ -30,8 +31,11 @@ abstract class Menu {
     Dimension panelDimension = new Dimension(140, 10);
 
     int index = -1;
+    protected String indexColumnName;
 
-    protected Menu(){
+    protected Menu(Main parent){
+        this.parent = parent;
+
         loadNext();
 
         previousButton.addActionListener(a -> {
@@ -41,13 +45,15 @@ abstract class Menu {
             loadNext();
         });
         addButton.addActionListener(a -> {
-            save();
+            try {
+                save();
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
         });
     }
 
     abstract void createUI(JTabbedPane tabWindow);
-
-    abstract void setUpButtonActionHandlers();
 
     JPanel setUpJPanel(){
         JPanel verticalPanel = new JPanel();
@@ -75,19 +81,19 @@ abstract class Menu {
     }
 
     public void loadNext(){
-        String query = "select * from " + getClass().getSimpleName() + " where 1 > "+index+" limit 1";
         try {
+            String query = "select * from " + getClass().getSimpleName() + " where " + indexColumnName + " > "+index+" order by 1 limit 1";
             load(query);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void loadPrevious(){
-        String query = "select * from " + getClass().getSimpleName() + " where 1 < "+index+" limit 1";
         try {
+            String query = "select * from " + getClass().getSimpleName() + " where " + indexColumnName + " < "+index+" order by 1 desc limit 1";
             load(query);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | SQLException e) {
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | SQLException | IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
     }
@@ -98,18 +104,31 @@ abstract class Menu {
      * based on the parent's fields.
      * @param query
      */
-    private void load(String query) throws NoSuchMethodException, IllegalAccessException, SQLException, InvocationTargetException {
+    private void load(String query) throws NoSuchMethodException, IllegalAccessException, SQLException, InvocationTargetException, IndexOutOfBoundsException {
         LinkedHashMap<String, ArrayList<Object>> results = DatabaseManager.instance.executeQuery(query);
+
+        System.out.println(this.getClass().getSimpleName()+ " -> Results from load = "+results.toString());
+
         Field[] fields = getClass().getFields();
-        for(Field field: fields){
-            if(!field.getName().contains("Field")){continue;}
-            JTextField.class.getMethod("setText", String.class).invoke(field.get(this), results.get(fieldToColumnName(field)).get(0).toString());
+        for(int i = 0; i<fields.length; i++){
+
+            ArrayList<Object> valueToSet = results.get(fieldToColumnName(fields[i]));
+            if(valueToSet != null && !valueToSet.isEmpty() && valueToSet.get(0) != null){
+                if(i == 0){index = Integer.parseInt(valueToSet.get(0).toString());}
+
+
+                if(fields[i].get(this) instanceof JTextField){
+                    JTextField.class.getMethod("setText", String.class).invoke(fields[i].get(this), valueToSet.get(0).toString());
+                }
+                else if(fields[i].get(this) instanceof JComboBox){
+                    JComboBox.class.getMethod("setSelectedItem", Object.class).invoke(fields[i].get(this), valueToSet.get(0).toString());
+                }
+
+            }
         }
 
-        index = Integer.parseInt(results.entrySet().iterator().next().toString());
-
         System.out.println(query);
-        System.out.println(Arrays.toString(fields));
+        System.out.println("Index = "+index);
     }
 
     /**
@@ -123,11 +142,18 @@ abstract class Menu {
         Field[] fields = getClass().getFields();
 
         for(int i = 0; i<fields.length; i++){
-            if(!fields[i].getName().contains("Field")){continue;}
-
             valueNames.append(fieldToColumnName(fields[i]));
 
-            values.append("'").append(JTextField.class.getMethod("getText").invoke(fields[i].get(this))).append("'");
+            if(fields[i].get(this) instanceof JTextField){
+                values.append("'").append(JTextField.class.getMethod("getText").invoke(fields[i].get(this))).append("'");
+            }
+            else if(fields[i].get(this) instanceof JComboBox){
+                String dropdownValue = JComboBox.class.getMethod("getSelectedItem").invoke(fields[i].get(this)).toString().split(" - ")[0];
+                values.append("'").append(dropdownValue).append("'");
+            }
+            else{
+                continue;
+            }
 
 
             if(i != fields.length-1){
