@@ -5,9 +5,6 @@ import com.bosowski.menus.Employee;
 import com.bosowski.menus.Project;
 import com.bosowski.tools.Constants;
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import java.sql.SQLException;
-
 
 public class Main implements Runnable {
 
@@ -15,7 +12,7 @@ public class Main implements Runnable {
     public Department department;
     public Project project;
 
-    public static void main(String args[]) throws SQLException {
+    public static void main(String args[]) {
         SwingUtilities.invokeLater(new Main());
     }
 
@@ -31,8 +28,10 @@ public class Main implements Runnable {
 
         tabWindow.addChangeListener(l -> {
             if(tabWindow.getSelectedIndex() == 0){
-                System.out.println("Refreshing employee's departments field..");
-                employee.refreshDepartmentsField();
+                Department.refreshDepartmentsField(employee.works_forField);
+            }
+            else if(tabWindow.getSelectedIndex() == 2){
+                Department.refreshDepartmentsField(project.controlled_ByField);
             }
         });
 

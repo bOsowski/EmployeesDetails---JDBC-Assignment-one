@@ -4,17 +4,19 @@ import com.bosowski.main.Main;
 
 import javax.swing.*;
 
-public class Project extends Menu{
+public class Project extends Menu {
 
     public JTextField numberField = new JTextField(20);
     public JTextField nameField = new JTextField(20);//createRestrictedTextField(20);
     public JTextField locationField = new JTextField(20);
-    public JTextField controlledByField = new JTextField(20);
+    public JComboBox<String> controlled_ByField = new JComboBox<>();
 
     public Project(JTabbedPane tabWindow, Main parent) {
         super(parent);
         createUI(tabWindow);
+        Department.refreshDepartmentsField(controlled_ByField);
         indexColumnName = "number";
+        loadNext();
     }
 
     public void createUI(JTabbedPane tabWindow) {
@@ -43,7 +45,7 @@ public class Project extends Menu{
         JPanel controlledByPanel = new JPanel();
         controlledByPanel.setSize(panelDimension);
         controlledByPanel.add(controlledByLabel);
-        controlledByPanel.add(controlledByField);
+        controlledByPanel.add(controlled_ByField);
 
         contentPanel.add(numberPanel);
         contentPanel.add(namePanel);
@@ -55,4 +57,7 @@ public class Project extends Menu{
 
         tabWindow.addTab("Project", jpanel);
     }
+
 }
+
+

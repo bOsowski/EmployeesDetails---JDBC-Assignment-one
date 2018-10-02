@@ -4,6 +4,7 @@ import com.bosowski.main.Main;
 import com.bosowski.tools.DatabaseManager;
 
 import javax.swing.*;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -17,12 +18,16 @@ public class Employee extends Menu{
     public JTextField salaryField = new JTextField(20);//createRestrictedTextField(20);
     public JTextField sexField = new JTextField(20);
     public JComboBox<String> works_forField = new JComboBox<>();
+    public JComboBox<String> managesField = new JComboBox<>();
+    public JComboBox<String> supervisesField = new JComboBox<>();
 
     public Employee(JTabbedPane tabWindow, Main parent) {
         super(parent);
         createUI(tabWindow);
-        refreshDepartmentsField();
+        Department.refreshDepartmentsField(works_forField);
+        refreshEmployeeFields();
         indexColumnName = "ssn";
+        loadNext();
     }
 
 
@@ -43,6 +48,9 @@ public class Employee extends Menu{
         JLabel salaryLabel = new JLabel("Salary");
         JLabel genderLabel = new JLabel("Gender");
         JLabel departmentsLabel = new JLabel("Works for");
+        JLabel managesLabel = new JLabel("Manages");
+        JLabel supervisesLabel = new JLabel("Supervises");
+
 
         //ssnField.setText();
 
@@ -81,6 +89,16 @@ public class Employee extends Menu{
         departmentsPanel.add(departmentsLabel);
         departmentsPanel.add(works_forField);
 
+        JPanel managesPanel = new JPanel();
+        managesPanel.setSize(panelDimension);
+        managesPanel.add(managesLabel);
+        managesPanel.add(managesField);
+
+        JPanel supervisesPanel = new JPanel();
+        supervisesPanel.setSize(panelDimension);
+        supervisesPanel.add(supervisesLabel);
+        supervisesPanel.add(supervisesField);
+
         contentPanel.add(ssnPanel);
         contentPanel.add(dobPanel);
         contentPanel.add(namePanel);
@@ -88,22 +106,54 @@ public class Employee extends Menu{
         contentPanel.add(salaryPanel);
         contentPanel.add(genderPanel);
         contentPanel.add(departmentsPanel);
+        contentPanel.add(managesPanel);
+        contentPanel.add(supervisesPanel);
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
         horizontalPanel.add(contentPanel);
     }
 
-    public void refreshDepartmentsField(){
-        works_forField.removeAllItems();
+    public void refreshEmployeeFields(){
+        String currentManagesFieldValue = (String)managesField.getSelectedItem();
+        String currentSupervisesFieldValue = (String)supervisesField.getSelectedItem();
+
+        managesField.removeAllItems();
+        supervisesField.removeAllItems();
         try {
-            LinkedHashMap<String, ArrayList<Object>> results = DatabaseManager.instance.executeQuery("select * from department");
-            for(int i = 0; i<results.get("number").size(); i++){
-                works_forField.addItem(results.get("number").get(i) + " - " + results.get("name").get(i));
+            LinkedHashMap<String, ArrayList<Object>> results = DatabaseManager.instance.executeQuery("select * from employee");
+            for(int i = 0; i<results.get("ssn").size(); i++){
+                String valueToAdd = results.get("ssn").get(i).toString();
+                managesField.addItem(valueToAdd);
+                supervisesField.addItem(valueToAdd);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        if(currentManagesFieldValue != null){
+            managesField.setSelectedItem(currentManagesFieldValue);
+        }
+        if(currentSupervisesFieldValue != null){
+            supervisesField.setSelectedItem(currentSupervisesFieldValue);
+        }
+
     }
 
+    @Override
+    protected void save() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        super.save();
+        refreshEmployeeFields();
+    }
 
+    @Override
+    protected void delete() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        super.delete();
+        refreshEmployeeFields();
+    }
+
+    @Override
+    protected void update() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        super.update();
+        refreshEmployeeFields();
+    }
 }

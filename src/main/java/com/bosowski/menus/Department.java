@@ -4,6 +4,9 @@ import com.bosowski.main.Main;
 import com.bosowski.tools.DatabaseManager;
 
 import javax.swing.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class Department extends Menu{
 
@@ -15,6 +18,7 @@ public class Department extends Menu{
         super(parent);
         createUI(tabWindow);
         indexColumnName = "number";
+        loadNext();
     }
 
     public void createUI(JTabbedPane tabWindow) {
@@ -47,4 +51,23 @@ public class Department extends Menu{
 
         horizontalPanel.add(contentPanel);
     }
+
+    public static void refreshDepartmentsField(JComboBox dropdown){
+        System.out.println("Refreshing employee's departments field..");
+        String currentValue = (String)dropdown.getSelectedItem();
+
+        dropdown.removeAllItems();
+        try {
+            LinkedHashMap<String, ArrayList<Object>> results = DatabaseManager.instance.executeQuery("select * from department");
+            for(int i = 0; i<results.get("number").size(); i++){
+                dropdown.addItem(results.get("number").get(i).toString());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if(currentValue != null){
+            dropdown.setSelectedItem(currentValue);
+        }
+    }
+
 }

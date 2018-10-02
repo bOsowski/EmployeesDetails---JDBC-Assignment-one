@@ -17,12 +17,12 @@ abstract class Menu {
 
     Main parent;
 
-    JButton previousButton = new JButton("Previous");
-    JButton nextButton = new JButton("Next");
-    JButton clearButton = new JButton("Clear");
-    JButton addButton = new JButton("Add");
-    JButton deleteButton = new JButton("Delete");
-    JButton updateButton = new JButton("Update");
+    private JButton previousButton = new JButton("Previous");
+    private JButton nextButton = new JButton("Next");
+    private JButton clearButton = new JButton("Clear");
+    private JButton addButton = new JButton("Add");
+    private JButton deleteButton = new JButton("Delete");
+    private JButton updateButton = new JButton("Update");
 
     JPanel verticalButtonPanel = new JPanel();
     JPanel bottomButtonPanel = new JPanel();
@@ -30,19 +30,32 @@ abstract class Menu {
     JPanel contentPanel = new JPanel();
     Dimension panelDimension = new Dimension(140, 10);
 
-    int index = -1;
+    private int index = Integer.MIN_VALUE;
     protected String indexColumnName;
 
     protected Menu(Main parent){
         this.parent = parent;
 
-        loadNext();
-
+        //Below adds actions to buttons.
         previousButton.addActionListener(a -> {
             loadPrevious();
         });
         nextButton.addActionListener(a -> {
             loadNext();
+        });
+        clearButton.addActionListener(a -> {
+            try {
+                clear();
+            } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        });
+        deleteButton.addActionListener(a -> {
+            try {
+                delete();
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                e.printStackTrace();
+            }
         });
         addButton.addActionListener(a -> {
             try {
@@ -51,11 +64,18 @@ abstract class Menu {
                 e.printStackTrace();
             }
         });
+        updateButton.addActionListener(a -> {
+            try {
+                update();
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     abstract void createUI(JTabbedPane tabWindow);
 
-    JPanel setUpJPanel(){
+    protected JPanel setUpJPanel(){
         JPanel verticalPanel = new JPanel();
         verticalPanel.setLayout(new BoxLayout(verticalPanel, BoxLayout.Y_AXIS));
         verticalPanel.setSize(new Dimension(Constants.WIDTH, Constants.HEIGHT));
@@ -80,7 +100,7 @@ abstract class Menu {
         return verticalPanel;
     }
 
-    public void loadNext(){
+    protected void loadNext(){
         try {
             String query = "select * from " + getClass().getSimpleName() + " where " + indexColumnName + " > "+index+" order by 1 limit 1";
             load(query);
@@ -89,7 +109,7 @@ abstract class Menu {
         }
     }
 
-    public void loadPrevious(){
+    protected void loadPrevious(){
         try {
             String query = "select * from " + getClass().getSimpleName() + " where " + indexColumnName + " < "+index+" order by 1 desc limit 1";
             load(query);
@@ -116,14 +136,12 @@ abstract class Menu {
             if(valueToSet != null && !valueToSet.isEmpty() && valueToSet.get(0) != null){
                 if(i == 0){index = Integer.parseInt(valueToSet.get(0).toString());}
 
-
                 if(fields[i].get(this) instanceof JTextField){
                     JTextField.class.getMethod("setText", String.class).invoke(fields[i].get(this), valueToSet.get(0).toString());
                 }
                 else if(fields[i].get(this) instanceof JComboBox){
                     JComboBox.class.getMethod("setSelectedItem", Object.class).invoke(fields[i].get(this), valueToSet.get(0).toString());
                 }
-
             }
         }
 
@@ -131,12 +149,55 @@ abstract class Menu {
         System.out.println("Index = "+index);
     }
 
+    protected void clear() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Field[] fields = getClass().getFields();
+        for (Field field : fields) {
+
+            if (field.get(this) instanceof JTextField) {
+                JTextField.class.getMethod("setText", String.class).invoke(field.get(this), "");
+            }
+
+            //do not clear the dropdowns
+            //else if(fields[i].get(this) instanceof JComboBox){
+            //}
+        }
+    }
+
+    protected void update() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        int oldIndex = index;
+        StringBuilder setStatement = new StringBuilder();
+        Field[] fields = getClass().getFields();
+
+        for(int i = 0; i<fields.length; i++){
+            setStatement.append(fieldToColumnName(fields[i]));
+            setStatement.append(" = ");
+
+            if (fields[i].get(this) instanceof JTextField) {
+                String value = JTextField.class.getMethod("getText").invoke(fields[i].get(this)).toString();
+                //get the new index in case it has changed
+                if(i == 0){index = Integer.parseInt(value);}
+                setStatement.append("'").append(value).append("'");
+            } else if (fields[i].get(this) instanceof JComboBox) {
+                String dropdownValue = JComboBox.class.getMethod("getSelectedItem").invoke(fields[i].get(this)).toString();
+                setStatement.append("'").append(dropdownValue).append("'");
+            }
+
+            if(i != fields.length-1){
+                setStatement.append(", ");
+            }
+        }
+
+        String query = "update " + getClass().getSimpleName() + " set " + setStatement + " where " + indexColumnName + " = " +oldIndex ;
+        DatabaseManager.instance.executeUpdate(query);
+    }
+
+
     /**
      * This method dynamically retrieves values saved in the parent object's
      * public fields and dynamically creates an insert statement based on
      * the parent class name and parent public fields.
      */
-    private void save() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    protected void save() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         StringBuilder valueNames = new StringBuilder("(");
         StringBuilder values = new StringBuilder("(");
         Field[] fields = getClass().getFields();
@@ -148,7 +209,7 @@ abstract class Menu {
                 values.append("'").append(JTextField.class.getMethod("getText").invoke(fields[i].get(this))).append("'");
             }
             else if(fields[i].get(this) instanceof JComboBox){
-                String dropdownValue = JComboBox.class.getMethod("getSelectedItem").invoke(fields[i].get(this)).toString().split(" - ")[0];
+                String dropdownValue = JComboBox.class.getMethod("getSelectedItem").invoke(fields[i].get(this)).toString();
                 values.append("'").append(dropdownValue).append("'");
             }
             else{
@@ -168,6 +229,12 @@ abstract class Menu {
 
         String query = "insert into " + getClass().getSimpleName() + valueNames + " values " + values;
         DatabaseManager.instance.executeUpdate(query);
+    }
+
+    protected void delete() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        DatabaseManager.instance.executeUpdate("delete from "+getClass().getSimpleName()+" where "+indexColumnName + " = '" +
+        JTextField.class.getMethod("getText").invoke(getClass().getFields()[0].get(this)) +"'");
+        clear();
     }
 
     private String fieldToColumnName(Field field){

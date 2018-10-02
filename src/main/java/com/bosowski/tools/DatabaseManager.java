@@ -2,7 +2,6 @@ package com.bosowski.tools;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class DatabaseManager {
