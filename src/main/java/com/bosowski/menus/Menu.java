@@ -1,21 +1,32 @@
 package com.bosowski.menus;
 
-import com.bosowski.main.Main;
 import com.bosowski.tools.Constants;
 import com.bosowski.tools.DatabaseManager;
 
 import java.lang.reflect.*;
 
 import javax.swing.*;
-import javax.xml.crypto.Data;
 import java.awt.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-abstract class Menu {
 
-    Main parent;
+/**
+ * @author bOsowski
+ * The below abstract class handles all of the query and
+ * behavior based on dynamically calling the extending classes'
+ * fields.
+ *
+ * The extending classes need to have fields with names which
+ * correspond to the representing database table, for example:
+ *
+ * consider a database with 2 columns: [id, name]
+ * The fields of the extending class need to be called
+ * idField, nameField.
+ *
+ */
+abstract class Menu {
 
     private JButton previousButton = new JButton("Previous");
     private JButton nextButton = new JButton("Next");
@@ -24,17 +35,20 @@ abstract class Menu {
     private JButton deleteButton = new JButton("Delete");
     private JButton updateButton = new JButton("Update");
 
-    JPanel verticalButtonPanel = new JPanel();
-    JPanel bottomButtonPanel = new JPanel();
-    JPanel horizontalPanel = new JPanel();
-    JPanel contentPanel = new JPanel();
-    Dimension panelDimension = new Dimension(140, 10);
+    protected JPanel verticalButtonPanel = new JPanel();
+    protected JPanel bottomButtonPanel = new JPanel();
+    protected JPanel horizontalPanel = new JPanel();
+    protected JPanel contentPanel = new JPanel();
+    protected Dimension panelDimension = new Dimension(140, 10);
 
     private int index = Integer.MIN_VALUE;
     protected String indexColumnName;
 
-    protected Menu(Main parent){
-        this.parent = parent;
+    /**
+     * @param indexDatabaseColumnName this is the name of the database column to be used for indexing.
+     */
+    protected Menu(String indexDatabaseColumnName){
+        this.indexColumnName = indexDatabaseColumnName;
 
         //Below adds actions to buttons.
         previousButton.addActionListener(a -> {
@@ -233,7 +247,7 @@ abstract class Menu {
 
     protected void delete() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         DatabaseManager.instance.executeUpdate("delete from "+getClass().getSimpleName()+" where "+indexColumnName + " = '" +
-        JTextField.class.getMethod("getText").invoke(getClass().getFields()[0].get(this)) +"'");
+                JTextField.class.getMethod("getText").invoke(getClass().getFields()[0].get(this)) +"'");
         clear();
     }
 

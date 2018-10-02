@@ -1,7 +1,5 @@
 package com.bosowski.menus;
 
-import com.bosowski.main.Main;
-
 import javax.swing.*;
 
 public class Project extends Menu {
@@ -11,11 +9,10 @@ public class Project extends Menu {
     public JTextField locationField = new JTextField(20);
     public JComboBox<String> controlled_ByField = new JComboBox<>();
 
-    public Project(JTabbedPane tabWindow, Main parent) {
-        super(parent);
+    public Project(JTabbedPane tabWindow) {
+        super("number");
         createUI(tabWindow);
         Department.refreshDepartmentsField(controlled_ByField);
-        indexColumnName = "number";
         loadNext();
     }
 

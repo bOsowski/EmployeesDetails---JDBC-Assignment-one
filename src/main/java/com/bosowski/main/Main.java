@@ -16,15 +16,14 @@ public class Main implements Runnable {
         SwingUtilities.invokeLater(new Main());
     }
 
-
     @Override
     public void run() {
         JFrame frame = new JFrame("Employee Details");
         JTabbedPane tabWindow = new JTabbedPane();
 
-        employee = new Employee(tabWindow, this);
-        department = new Department(tabWindow, this);
-        project = new Project(tabWindow, this);
+        employee = new Employee(tabWindow);
+        department = new Department(tabWindow);
+        project = new Project(tabWindow);
 
         tabWindow.addChangeListener(l -> {
             if(tabWindow.getSelectedIndex() == 0){
@@ -34,8 +33,6 @@ public class Main implements Runnable {
                 Department.refreshDepartmentsField(project.controlled_ByField);
             }
         });
-
-
 
         frame.add(tabWindow);
         frame.setSize(Constants.WIDTH, Constants.HEIGHT);

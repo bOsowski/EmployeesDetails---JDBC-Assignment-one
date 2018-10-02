@@ -1,6 +1,5 @@
 package com.bosowski.menus;
 
-import com.bosowski.main.Main;
 import com.bosowski.tools.DatabaseManager;
 
 import javax.swing.*;
@@ -21,15 +20,13 @@ public class Employee extends Menu{
     public JComboBox<String> managesField = new JComboBox<>();
     public JComboBox<String> supervisesField = new JComboBox<>();
 
-    public Employee(JTabbedPane tabWindow, Main parent) {
-        super(parent);
+    public Employee(JTabbedPane tabWindow) {
+        super("ssn");
         createUI(tabWindow);
         Department.refreshDepartmentsField(works_forField);
         refreshEmployeeFields();
-        indexColumnName = "ssn";
         loadNext();
     }
-
 
     public void createUI(JTabbedPane tabWindow) {
         JPanel verticalPanel = setUpJPanel();
@@ -136,7 +133,6 @@ public class Employee extends Menu{
         if(currentSupervisesFieldValue != null){
             supervisesField.setSelectedItem(currentSupervisesFieldValue);
         }
-
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.bosowski.menus;
 
-import com.bosowski.main.Main;
 import com.bosowski.tools.DatabaseManager;
 
 import javax.swing.*;
@@ -14,10 +13,9 @@ public class Department extends Menu{
     public JTextField nameField = new JTextField(20);
     public JTextField locationsField = new JTextField(20);
 
-    public Department(JTabbedPane tabWindow, Main parent) {
-        super(parent);
+    public Department(JTabbedPane tabWindow) {
+        super("number");
         createUI(tabWindow);
-        indexColumnName = "number";
         loadNext();
     }
 
@@ -52,7 +50,7 @@ public class Department extends Menu{
         horizontalPanel.add(contentPanel);
     }
 
-    public static void refreshDepartmentsField(JComboBox dropdown){
+    public static void refreshDepartmentsField(JComboBox<String> dropdown){
         System.out.println("Refreshing employee's departments field..");
         String currentValue = (String)dropdown.getSelectedItem();
 
