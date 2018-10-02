@@ -32,7 +32,7 @@ public class DatabaseManager {
         ResultSet rs = conn.prepareStatement(sqlQuery).executeQuery();
         ResultSetMetaData rsmd = rs.getMetaData();
 
-        for(int i = 1; i < rsmd.getColumnCount(); i++){
+        for(int i = 1; i <= rsmd.getColumnCount(); i++){
             result.put(rsmd.getColumnLabel(i).toLowerCase(), new ArrayList<>());
         }
 
